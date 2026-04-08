@@ -987,6 +987,14 @@ def TLSModel : InheritableAttr {
   let Documentation = [TLSModelDocs];
 }
 
+def DataflowModel : InheritableAttr {
+  let Spellings = [Clang<"models">];
+  let Subjects = SubjectList<[Record], ErrorDiag>;
+  let Args = [StringArgument<"Model">];
+  let LangOpts = [CPlusPlus];
+  let Documentation = [Undocumented];
+}
+
 def AnalyzerNoReturn : InheritableAttr {
   // TODO: should this attribute be exposed with a [[]] spelling under the clang
   // vendor namespace, or should it use a vendor namespace specific to the

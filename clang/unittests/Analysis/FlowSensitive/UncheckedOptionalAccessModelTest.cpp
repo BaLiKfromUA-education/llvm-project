@@ -2963,6 +2963,30 @@ TEST_P(UncheckedOptionalAccessTest, AssertFalseGtestMacroWithNullableValue) {
   )cc");
 }
 
+TEST_P(UncheckedOptionalAccessTest, TestCustomAttributeBalik) {
+    ExpectDiagnosticsFor(R"cc(
+    #include "unchecked_optional_access_test.h"
+    
+    template <typename T>
+    class __attribute__((models("std::optional"))) MyOptional {
+    public:
+      bool has_value() const;
+
+      T& value();
+      const T& value() const;
+    };
+
+
+    void target(MyOptional<int> opt) {
+      opt.value(); // [[unsafe]]
+
+      if (opt.has_value()) {
+        opt.value();
+      }
+    }
+  )cc");
+}
+
 // FIXME: Add support for:
 // - constructors (copy, move)
 // - assignment operators (default, copy, move)

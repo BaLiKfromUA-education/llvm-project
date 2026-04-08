@@ -13,6 +13,7 @@
 
 #include "clang/Analysis/FlowSensitive/Models/UncheckedOptionalAccessModel.h"
 #include "clang/AST/ASTContext.h"
+#include "clang/AST/Attr.h"
 #include "clang/AST/DeclCXX.h"
 #include "clang/AST/Expr.h"
 #include "clang/AST/ExprCXX.h"
@@ -59,9 +60,19 @@ static bool isFullyQualifiedNamespaceEqualTo(const NamespaceDecl &NS,
   }
 }
 
+static bool hasDataflowModelAttr(const CXXRecordDecl &RD,
+                                 llvm::StringRef Model) {
+  if (const auto *A = RD.getAttr<DataflowModelAttr>())
+    return A->getModel() == Model;
+  return false;
+}
+
 static bool hasOptionalClassName(const CXXRecordDecl &RD) {
   if (!RD.getDeclName().isIdentifier())
     return false;
+
+  if (hasDataflowModelAttr(RD, "std::optional"))
+    return true;
 
   if (RD.getName() == "optional") {
     if (const auto *N = dyn_cast_or_null<NamespaceDecl>(RD.getDeclContext()))

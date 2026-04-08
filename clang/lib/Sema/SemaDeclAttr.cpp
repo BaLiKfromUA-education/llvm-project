@@ -1757,6 +1757,14 @@ static void handleTLSModelAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   D->addAttr(::new (S.Context) TLSModelAttr(S.Context, AL, Model));
 }
 
+static void handleDataflowModelAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
+  StringRef Model;
+  if (!S.checkStringLiteralArgumentAttr(AL, 0, Model))
+    return;
+
+  D->addAttr(::new (S.Context) DataflowModelAttr(S.Context, AL, Model));
+}
+
 static void handleRestrictAttr(Sema &S, Decl *D, const ParsedAttr &AL) {
   QualType ResultType = getFunctionOrMethodResultType(D);
   if (!ResultType->isAnyPointerType() && !ResultType->isBlockPointerType()) {
@@ -7481,6 +7489,9 @@ ProcessDeclAttribute(Sema &S, Scope *scope, Decl *D, const ParsedAttr &AL,
     break;
   case ParsedAttr::AT_AnalyzerNoReturn:
     handleAnalyzerNoReturnAttr(S, D, AL);
+    break;
+  case ParsedAttr::AT_DataflowModel:
+    handleDataflowModelAttr(S, D, AL);
     break;
   case ParsedAttr::AT_TLSModel:
     handleTLSModelAttr(S, D, AL);
